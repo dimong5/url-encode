@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -9,7 +10,27 @@ import (
 )
 
 func main() {
-	store := storage.NewURLStore()
+	storageType := flag.String("storage", "memory", "storage type: memory or postgres")
+	connStr := flag.String("db", "user=postgres dbname=urlshort sslmode=disable", "postgres connection string")
+	flag.Parse()
+
+	var store interface {
+		Save(short, original string) error
+		Get(short string) (string, error)
+		FindByOriginal(original string) string
+	}
+
+	if *storageType == "postgres" {
+		s, err := storage.NewPostgresStorage(*connStr)
+		if err != nil {
+			log.Fatal(err)
+		}
+		store = s
+	} else {
+		store = storage.NewURLStore()
+	}
+
+	//store := storage.NewURLStore()
 	svc := service.NewService(store)
 
 	http.HandleFunc("/shorten", handleShorten(svc))

@@ -12,8 +12,9 @@ func NewURLStore() *URLStore {
 	return &URLStore{urls: make(map[string]string)}
 }
 
-func (s *URLStore) Save(short, original string) {
+func (s *URLStore) Save(short, original string) error {
 	s.urls[short] = original
+	return nil
 }
 
 func (s *URLStore) Get(short string) (string, error) {
