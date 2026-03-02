@@ -60,7 +60,8 @@ func handleShorten(svc *service.Service) http.HandlerFunc {
 
 func handleRedirect(svc *service.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		shortURL := r.PathValue("short")
+		path := r.URL.Path 
+		shortURL := path[10:] 
 		if shortURL == "" {
 			http.Error(w, "short URL required", http.StatusBadRequest)
 			return
